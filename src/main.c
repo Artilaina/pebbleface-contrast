@@ -84,14 +84,12 @@ const int TINY_IMAGE_RESOURCE_IDS[] = {
   RESOURCE_ID_IMAGE_TINY_6,
   RESOURCE_ID_IMAGE_TINY_7,
   RESOURCE_ID_IMAGE_TINY_8,
-  RESOURCE_ID_IMAGE_TINY_9,
-
+  RESOURCE_ID_IMAGE_TINY_9
 };
 
 #define TOTAL_SECONDS_DIGITS 2
 static GBitmap *seconds_digits_images[TOTAL_SECONDS_DIGITS];
 static BitmapLayer *seconds_digits_layers[TOTAL_SECONDS_DIGITS];
-
 
 void change_background(bool invert) {
 
@@ -131,51 +129,50 @@ static void sync_tuple_changed_callback(const uint32_t key, const Tuple* new_tup
       }
       break;
 	*/  
-	case INVERT_COLOR_KEY:
+    case INVERT_COLOR_KEY:
       invert = new_tuple->value->uint8 != 0;
-	  persist_write_bool(INVERT_COLOR_KEY, invert);
+      persist_write_bool(INVERT_COLOR_KEY, invert);
       change_background(invert);
-      break;
+    break;
 	
     case BLUETOOTHVIBE_KEY:
       bluetoothvibe = new_tuple->value->uint8 != 0;
-	  persist_write_bool(BLUETOOTHVIBE_KEY, bluetoothvibe);
-      break;      
+      persist_write_bool(BLUETOOTHVIBE_KEY, bluetoothvibe);
+    break;      
 	  
     case HOURLYVIBE_KEY:
       hourlyvibe = new_tuple->value->uint8 != 0;
-	  persist_write_bool(HOURLYVIBE_KEY, hourlyvibe);	  
-      break;
+      persist_write_bool(HOURLYVIBE_KEY, hourlyvibe);	  
+    break;
 	  
-	case SECS_KEY:
+	  case SECS_KEY:
       secs = new_tuple->value->uint8 !=0;
-	  	  persist_write_bool(SECS_KEY, secs);	  
+      persist_write_bool(SECS_KEY, secs);	  
 
-	  if (appStarted & !secs) { 
-		  tick_timer_service_subscribe(MINUTE_UNIT, handle_tick);
-	      layer_set_hidden(bitmap_layer_get_layer(seconds_digits_layers[0]), true);
-	      layer_set_hidden(bitmap_layer_get_layer(seconds_digits_layers[1]), true);
-		  
-	  } else {
-	    tick_timer_service_subscribe(SECOND_UNIT, handle_tick);
- 		layer_set_hidden(bitmap_layer_get_layer(seconds_digits_layers[0]), false);
-	    layer_set_hidden(bitmap_layer_get_layer(seconds_digits_layers[1]), false);
+      if (appStarted & !secs) { 
+        tick_timer_service_subscribe(MINUTE_UNIT, handle_tick);
+        layer_set_hidden(bitmap_layer_get_layer(seconds_digits_layers[0]), true);
+        layer_set_hidden(bitmap_layer_get_layer(seconds_digits_layers[1]), true);
 
-	  }
+      } else {
+        tick_timer_service_subscribe(SECOND_UNIT, handle_tick);
+        layer_set_hidden(bitmap_layer_get_layer(seconds_digits_layers[0]), false);
+        layer_set_hidden(bitmap_layer_get_layer(seconds_digits_layers[1]), false);
+      }
+
+    break;
 	  
-      break;
-	  
-	  case TIMEFORMAT_KEY:
+    case TIMEFORMAT_KEY:
       timeformat = new_tuple->value->uint8 !=0;
-	  	  persist_write_bool(TIMEFORMAT_KEY, timeformat);	  
+      persist_write_bool(TIMEFORMAT_KEY, timeformat);	  
 
-	  if (timeformat) { 
-	      layer_set_hidden(bitmap_layer_get_layer(time_format_layer), true);
-	  } else {
-	      layer_set_hidden(bitmap_layer_get_layer(time_format_layer), false);
-	  }
-      break;
-  
+      if (timeformat) { 
+        layer_set_hidden(bitmap_layer_get_layer(time_format_layer), true);
+      } else {
+        layer_set_hidden(bitmap_layer_get_layer(time_format_layer), false);
+      }
+    break;
+
   }
 }
 
@@ -202,8 +199,7 @@ unsigned short get_display_hour(unsigned short hour) {
 
 static void toggle_bluetooth(bool connected) {
   if(appStarted && !connected && bluetoothvibe) {
-	
- //vibe!
+    //vibe!
     vibes_long_pulse();
   }
 }
@@ -213,25 +209,23 @@ void bluetooth_connection_callback(bool connected) {
 }
 
 static void update_hours(struct tm *tick_time) {
-
   if(appStarted && hourlyvibe) {
     //vibe!
     vibes_short_pulse();
   }
   
-   unsigned short display_hour = get_display_hour(tick_time->tm_hour);
+  unsigned short display_hour = get_display_hour(tick_time->tm_hour);
 
   set_container_image(&time_digits_images[0], time_digits_layers[0], BIG_DIGIT_IMAGE_RESOURCE_IDS[display_hour/10], GPoint(11, 37));
   set_container_image(&time_digits_images[1], time_digits_layers[1], BIG_DIGIT_IMAGE_RESOURCE_IDS[display_hour%10], GPoint(39, 37));
 	
-
   if (!clock_is_24h_style()) {
     if (tick_time->tm_hour >= 12) {
       set_container_image(&time_format_image, time_format_layer, RESOURCE_ID_IMAGE_MODE_PM, GPoint(70, 108));
       layer_set_hidden(bitmap_layer_get_layer(time_format_layer), false);
     } 
     else {
-       set_container_image(&time_format_image, time_format_layer, RESOURCE_ID_IMAGE_MODE_AM, GPoint(70, 108));
+      set_container_image(&time_format_image, time_format_layer, RESOURCE_ID_IMAGE_MODE_AM, GPoint(70, 108));
     }
     
     if (display_hour/10 == 0) {
@@ -246,7 +240,6 @@ static void update_hours(struct tm *tick_time) {
 static void update_minutes(struct tm *tick_time) {
   set_container_image(&min_digits_images[0], min_digits_layers[0], MIN_DIGIT_IMAGE_RESOURCE_IDS[tick_time->tm_min/10], GPoint(70, 37));
   set_container_image(&min_digits_images[1], min_digits_layers[1], MIN_DIGIT_IMAGE_RESOURCE_IDS[tick_time->tm_min%10], GPoint(96, 37));
-	
 }
 
 static void update_seconds(struct tm *tick_time) {
@@ -264,7 +257,6 @@ static void update_seconds(struct tm *tick_time) {
 }
 
 static void handle_tick(struct tm *tick_time, TimeUnits units_changed) {
-
   if (units_changed & HOUR_UNIT) {
     update_hours(tick_time);
   }
@@ -297,8 +289,8 @@ static void init(void) {
 
   window = window_create();
   if (window == NULL) {
-      //APP_LOG(APP_LOG_LEVEL_DEBUG, "OOM: couldn't allocate window");
-      return;
+    //APP_LOG(APP_LOG_LEVEL_DEBUG, "OOM: couldn't allocate window");
+    return;
   }
 	
   set_style();

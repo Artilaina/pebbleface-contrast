@@ -131,15 +131,16 @@ void battery_layer_update_callback(Layer *me, GContext* ctx) {
 void qtp_update_date(struct tm *tick_time) {
 
 	static char date_text[] = "xxxxxxxxx 00";
+  // Local language
+  static char * sys_locale = i18n_get_system_locale();
 		
 	// Only update the date when it's changed.
-    int new_cur_day = tick_time->tm_year*1000 + tick_time->tm_yday;
-    if (new_cur_day != cur_day) {
-        cur_day = new_cur_day;
+  int new_cur_day = tick_time->tm_year*1000 + tick_time->tm_yday;
+  if (new_cur_day != cur_day) {
+    cur_day = new_cur_day;
 	}
-        strftime(date_text, sizeof(date_text), "%B %e", tick_time);
-        text_layer_set_text(qtp_date_layer, date_text);
-
+  strftime(date_text, sizeof(date_text), "%B %e", tick_time);
+  text_layer_set_text(qtp_date_layer, date_text);
 }
 
 void force_update(void) {
@@ -168,20 +169,20 @@ void qtp_init() {
 	qtp_window = window_create();
 
 	memset(&battery_percent_layers, 0, sizeof(battery_percent_layers));
-    memset(&battery_percent_image, 0, sizeof(battery_percent_image));
+  memset(&battery_percent_image, 0, sizeof(battery_percent_image));
 
 	qtp_background_color  = GColorBlack;
-    window_set_background_color(qtp_window, qtp_background_color);
+  window_set_background_color(qtp_window, qtp_background_color);
   Layer *qtp_window_layer = window_get_root_layer(qtp_window);
 	
-GRect date_frame = GRect( 0,142,122,32 );
-		qtp_date_layer = text_layer_create(date_frame);
-	    text_layer_set_text_color(qtp_date_layer, GColorWhite);
-        text_layer_set_background_color(qtp_date_layer, GColorClear);
-		text_layer_set_text_alignment(qtp_date_layer, GTextAlignmentRight);
-		//text_layer_set_font(qtp_date_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
-	    text_layer_set_font(qtp_date_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_SKA_16)));
-		layer_add_child(window_get_root_layer(qtp_window), text_layer_get_layer(qtp_date_layer));
+  GRect date_frame = GRect( 0,142,122,32 );
+	qtp_date_layer = text_layer_create(date_frame);
+	text_layer_set_text_color(qtp_date_layer, GColorWhite);
+  text_layer_set_background_color(qtp_date_layer, GColorClear);
+  text_layer_set_text_alignment(qtp_date_layer, GTextAlignmentRight);
+  //text_layer_set_font(qtp_date_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
+  text_layer_set_font(qtp_date_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_SKA_16)));
+  layer_add_child(window_get_root_layer(qtp_window), text_layer_get_layer(qtp_date_layer));
 	
   battery_image = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BATTERY);
   GRect framebatt = (GRect) {
@@ -197,8 +198,8 @@ GRect date_frame = GRect( 0,142,122,32 );
   layer_add_child(qtp_window_layer, bitmap_layer_get_layer(battery_layer));
 	
   GRect dummy_frame = { {0, 0}, {0, 0} };
-   day_name_layer = bitmap_layer_create(dummy_frame);
-   layer_add_child(qtp_window_layer, bitmap_layer_get_layer(day_name_layer));	
+  day_name_layer = bitmap_layer_create(dummy_frame);
+  layer_add_child(qtp_window_layer, bitmap_layer_get_layer(day_name_layer));	
 	
 
   for (int i = 0; i < TOTAL_BATTERY_PERCENT_DIGITS; ++i) {
@@ -240,14 +241,14 @@ void qtp_app_deinit() {
   bitmap_layer_destroy(battery_layer);
   gbitmap_destroy(battery_image);
   
- // layer_remove_from_parent(bitmap_layer_get_layer(battery_image_layer));
- // bitmap_layer_destroy(battery_image_layer);
+  // layer_remove_from_parent(bitmap_layer_get_layer(battery_image_layer));
+  // bitmap_layer_destroy(battery_image_layer);
 
   layer_remove_from_parent(bitmap_layer_get_layer(day_name_layer));
   bitmap_layer_destroy(day_name_layer);
   gbitmap_destroy(day_name_image);
 	
-for (int i = 0; i < TOTAL_BATTERY_PERCENT_DIGITS; i++) {
+  for (int i = 0; i < TOTAL_BATTERY_PERCENT_DIGITS; i++) {
     layer_remove_from_parent(bitmap_layer_get_layer(battery_percent_layers[i]));
     gbitmap_destroy(battery_percent_image[i]);
     bitmap_layer_destroy(battery_percent_layers[i]); 
