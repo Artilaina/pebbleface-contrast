@@ -1,4 +1,4 @@
-# pebbleface-contrast
+# pebbleface-contrast Color
 
 Actualización del estupendo Watchface de Chops Contrast
 
